@@ -1,17 +1,31 @@
 var numberOfPagesToOpen = 10;
-var url = 'https://rg.scedev.com/';
+
+var url = '';
+var system = require('system');
+var args = system.args;
+if (args.length === 1) {
+    console.log('Usage:\nphantomjs http://url 100\nReturns how long it takes to load url 100 times.');
+} else {
+    var url = args[1] || 'https://ps4.scedev.com/';
+    numberOfPagesToOpen = args[2] ? args[2] : 10;
+}
 
 var page = require('webpage').create();
 var startTime = new Date();
 var numberOfPagesOpened = 0;
 
+var getElapsedTime = function(date) {
+    return date - startTime;
+};
+
 var startTest = function() {
-    console.log('test started: ' + new Date());
+    startTime = new Date();
+    console.log('Testing ' + url + ' ' + numberOfPagesToOpen + ' times.');
     openPage();
 };
 
 var continueTest  = function() {
-    console.log('page ' + numberOfPagesOpened + ': ' + new Date());
+    console.log('page ' + numberOfPagesOpened + ': ' + getElapsedTime(new Date()));
     numberOfPagesOpened++;
     if (numberOfPagesOpened < numberOfPagesToOpen) {
         openPage();
@@ -22,7 +36,7 @@ var continueTest  = function() {
 
 var openPage = function() {
     page.open(url, function (status) {
-        if (status != 'success') {
+        if (status == 'error') {
             console.log(url + ' failed to load.');
             phantom.exit(1);
         }
@@ -43,7 +57,9 @@ var openPage = function() {
 var endTest = function() {
     var endTime = new Date();
     var elapsedTime = endTime - startTime;
-    console.log('elapsedTime: ' + elapsedTime);
+    console.log('Loaded ' + url + ' '
+        + numberOfPagesToOpen + ' times\n'
+        + 'Elapsed: ' + elapsedTime + 'ms');
     phantom.exit();
 };
 

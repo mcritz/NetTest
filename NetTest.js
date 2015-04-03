@@ -3,6 +3,7 @@ var numberOfPagesToOpen = 10;
 var url = '';
 var system = require('system');
 var args = system.args;
+var failures = 0;
 if (args.length === 1) {
     console.log('Usage:\nphantomjs http://url 100\nReturns how long it takes to load url 100 times.');
     phantom.exit(0);
@@ -37,9 +38,15 @@ var continueTest  = function() {
 
 var openPage = function() {
     page.open(url, function (status) {
-        if (status == 'error') {
-            console.log(url + ' failed to load.');
-            phantom.exit(1);
+        switch (status) {
+            case 'error':
+                console.log(url + ' failed to load.');
+                phantom.exit(1);
+                break;
+            case 'fail':
+                failures++;
+            default:
+                break;
         }
         console.log('Loading page: ' + numberOfPagesOpened + ': ' + new Date() + '\nstatus: ' + status);
         page.evaluate(function(data) {
@@ -55,12 +62,23 @@ var openPage = function() {
     };
 };
 
+var getFailureMessage = function(fails) {
+    if (!fails) {
+        return;
+    }
+    var percentFail = numberOfPagesToOpen / fails * 100;
+    return 'Failures: ' + fails + ' ('  + Math.round(percentFail) + '%)';
+};
+
 var endTest = function() {
     var endTime = new Date();
     var elapsedTime = endTime - startTime;
-    console.log('Loaded ' + url + ' '
+    var failureMessage = '';
+    console.log('\n\n***************\nLoaded ' + url + ' '
         + numberOfPagesToOpen + ' times\n'
-        + 'Elapsed: ' + elapsedTime + 'ms');
+        + '\tElapsed: ' + elapsedTime + 'ms'
+        + '\n\t' + getFailureMessage(failures)
+        +'\n***************');
     phantom.exit();
 };
 

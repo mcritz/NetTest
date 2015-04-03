@@ -6,7 +6,7 @@ var args = system.args;
 if (args.length === 1) {
     console.log('Usage:\nphantomjs http://url 100\nReturns how long it takes to load url 100 times.');
 } else {
-    var url = args[1] || 'https://ps4.scedev.com/';
+    var url = args[1] || 'https://google.com/';
     numberOfPagesToOpen = args[2] ? args[2] : 10;
 }
 

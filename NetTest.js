@@ -5,6 +5,7 @@ var system = require('system');
 var args = system.args;
 if (args.length === 1) {
     console.log('Usage:\nphantomjs http://url 100\nReturns how long it takes to load url 100 times.');
+    phantom.exit(0);
 } else {
     var url = args[1] || 'https://google.com/';
     numberOfPagesToOpen = args[2] ? args[2] : 10;
